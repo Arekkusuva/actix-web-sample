@@ -1,6 +1,7 @@
 #[macro_use]
 extern crate slog;
-
+#[macro_use]
+extern crate diesel;
 #[macro_use]
 mod macros;
 mod logger;

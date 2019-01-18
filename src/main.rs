@@ -5,6 +5,7 @@ extern crate slog;
 mod macros;
 mod logger;
 mod api;
+mod db;
 
 use slog::Logger;
 use std::sync::Arc;

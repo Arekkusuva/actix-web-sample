@@ -18,9 +18,19 @@
 /// ```
 macro_rules! setup_routes {
     ($app:expr, $name:expr, [$(($path:expr, $method:expr, $handler:expr),)* $(,)*]$(,)*) => {{
+        let mut r = std::collections::HashMap::new();
         $(
-            $app = $app.resource(&format!("/{}{}", $name, $path), |r| r.method($method).f($handler));
+            r.entry($path.trim_end_matches("/"))
+                .or_insert_with(|| Vec::with_capacity(1))
+                .push(($method, $handler));
         )*
+        for (path, handlers) in r {
+            $app = $app.resource(&format!("/{}{}", $name, path), |r| {
+                for (method, handler) in handlers {
+                    r.method(method).f(handler);
+                }
+            });
+        }
         $app
     }};
 }

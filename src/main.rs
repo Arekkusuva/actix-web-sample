@@ -8,19 +8,22 @@ mod logger;
 mod api;
 mod db;
 
-use slog::Logger;
 use std::sync::Arc;
 
-#[derive(Clone, Debug)]
+use self::db::Database;
+
+#[derive(Clone)]
 pub struct AppState {
-    pub logger: Logger,
+    pub logger: slog::Logger,
+    pub db: Database,
 }
 
 pub type SharedState = Arc<AppState>;
 
 fn main() {
-    let app_state = AppState {
-        logger: logger::new(),
-    };
+    let logger = logger::new();
+    let db = Database::new("postgresql://localhost/actixwebsampledb?user=testuser&password=password");
+    let app_state = AppState { logger, db };
+
     api::run(SharedState::new(app_state))
 }

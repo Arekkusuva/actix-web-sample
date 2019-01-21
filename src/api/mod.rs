@@ -8,8 +8,8 @@ mod middlewares;
 
 use crate::SharedState;
 
-type ApiApp = App<SharedState>;
-type Request = HttpRequest<SharedState>;
+pub type ApiApp = App<SharedState>;
+pub type Request = HttpRequest<SharedState>;
 
 pub fn run(state: SharedState) {
     server::new(move || handlers::build(state.clone()))

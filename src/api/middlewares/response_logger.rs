@@ -22,8 +22,8 @@ impl Middleware<SharedState> for ResponseLoggerMiddleware {
 
         info!(
             req.logger(),
-            "Request with response status: {} ({}), took: {} ms",
-            resp.status(), resp.status().canonical_reason().unwrap(), delta,
+            "Request with response status: {}, took: {} ms",
+            resp.status(), delta,
         );
         Finished::Done
     }

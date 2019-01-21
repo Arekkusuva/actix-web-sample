@@ -1,13 +1,10 @@
-use actix_web::Responder;
-use actix_web::http::Method;
-
 use crate::api::prelude::*;
-use crate::api::{ApiApp, Request};
+use crate::SharedState;
 
 fn get_users(req: &Request) -> impl Responder {
     let l = req.logger();
-    info!(l, "test log");
-    format!("GET users")
+    let count = (req.state() as &SharedState).db.users().count();
+    format!("Users count {:?}", count)
 }
 
 pub fn config(mut app: ApiApp) -> ApiApp {

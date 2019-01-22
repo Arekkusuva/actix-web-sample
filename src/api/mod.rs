@@ -1,15 +1,15 @@
-use actix_web::{App, HttpRequest};
+use actix_web::App;
 use actix_web::server;
 
 pub mod prelude;
 
 mod handlers;
 mod middlewares;
+mod transport;
 
 use crate::SharedState;
 
 pub type ApiApp = App<SharedState>;
-pub type Request = HttpRequest<SharedState>;
 
 pub fn run(state: SharedState) {
     server::new(move || handlers::build(state.clone()))

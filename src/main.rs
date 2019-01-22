@@ -3,6 +3,8 @@ extern crate slog;
 #[macro_use]
 extern crate diesel;
 #[macro_use]
+extern crate serde_derive;
+#[macro_use]
 mod macros;
 mod logger;
 mod api;

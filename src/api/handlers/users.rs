@@ -2,7 +2,7 @@ use crate::api::prelude::*;
 use crate::SharedState;
 
 fn get_users(req: &Request) -> impl Responder {
-    let l = req.logger();
+    let _l = req.logger();
     let count = (req.state() as &SharedState).db.users().count();
     format!("Users count {:?}", count)
 }

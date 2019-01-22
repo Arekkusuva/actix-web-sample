@@ -1,4 +1,7 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    name VARCHAR NOT NULL
+    email VARCHAR(254) NOT NULL,
+    password VARCHAR(120) NOT NULL,
+    -- Constraints
+    CONSTRAINT users_email_unq_key UNIQUE(email)
 );

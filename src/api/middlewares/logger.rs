@@ -1,6 +1,6 @@
 use slog::Logger;
 
-use crate::api::Request;
+use crate::api::transport::Request;
 
 pub trait LoggerReqExt {
     fn root_logger(&self) -> Logger;

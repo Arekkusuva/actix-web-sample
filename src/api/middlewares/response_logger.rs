@@ -3,8 +3,8 @@ use actix_web::middleware::{Started, Finished, Middleware};
 use time::precise_time_ns;
 
 use crate::SharedState;
-use crate::api::prelude::LoggerReqExt;
-use crate::api::Request;
+use crate::api::middlewares::logger::LoggerReqExt;
+use crate::api::transport::Request;
 
 pub struct ResponseLoggerMiddleware;
 

@@ -4,6 +4,7 @@ use actix_web::error::Error as ActixWebError;
 use actix_web::http::StatusCode;
 use serde::{Serialize, Serializer};
 use serde_json::Value as JsonValue;
+use validator::ValidationErrors;
 
 use std::convert::Into;
 use std::error::Error;
@@ -103,6 +104,13 @@ impl From<DbError> for Response {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 StatusCode::INTERNAL_SERVER_ERROR.canonical_reason().unwrap()),
         }
+    }
+}
+
+// TODO: Finish it
+impl From<ValidationErrors> for Response {
+    fn from(_err: ValidationErrors) -> Self {
+        Response::new(StatusCode::BAD_REQUEST)
     }
 }
 

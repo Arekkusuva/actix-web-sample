@@ -11,13 +11,11 @@ use std::fmt;
 use std::convert::From;
 use std::error;
 
-//use crate::api::Request;
-
-pub type DBConnection = PooledConnection<ConnectionManager<PgConnection>>;
-pub type DBPool = Pool<ConnectionManager<PgConnection>>;
+pub type DbConnection = PooledConnection<ConnectionManager<PgConnection>>;
+pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 #[derive(Debug)]
-pub enum Error {
+pub enum DbError {
     AlreadyExist,
     NotFound,
     ForeignKeyViolation,
@@ -25,50 +23,50 @@ pub enum Error {
     UnrecognizedDatabaseError(DieselError),
 }
 
-pub type Result<T> = std::result::Result<T, Error>;
+pub type DbResult<T> = std::result::Result<T, DbError>;
 
-impl fmt::Display for Error {
+impl fmt::Display for DbError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::NotFound => f.write_str("NotFound"),
-            Error::AlreadyExist => f.write_str("AlreadyExist"),
-            Error::ForeignKeyViolation => f.write_str("ForeignKeyViolation"),
-            Error::CryptoError(ref e) => e.fmt(f),
-            Error::UnrecognizedDatabaseError(ref e) => e.fmt(f),
+            DbError::NotFound => f.write_str("NotFound"),
+            DbError::AlreadyExist => f.write_str("AlreadyExist"),
+            DbError::ForeignKeyViolation => f.write_str("ForeignKeyViolation"),
+            DbError::CryptoError(ref e) => e.fmt(f),
+            DbError::UnrecognizedDatabaseError(ref e) => e.fmt(f),
         }
     }
 }
 
-impl error::Error for Error {}
+impl error::Error for DbError {}
 
-impl From<DieselError> for Error {
+impl From<DieselError> for DbError {
     fn from(err: DieselError) -> Self {
         match err {
-            DieselError::NotFound => Error::NotFound,
+            DieselError::NotFound => DbError::NotFound,
             DieselError::DatabaseError(kind, _) => match kind {
-                DatabaseErrorKind::ForeignKeyViolation => Error::ForeignKeyViolation,
-                DatabaseErrorKind::UnableToSendCommand => Error::AlreadyExist,
-                _ => Error::UnrecognizedDatabaseError(err),
+                DatabaseErrorKind::ForeignKeyViolation => DbError::ForeignKeyViolation,
+                DatabaseErrorKind::UnableToSendCommand => DbError::AlreadyExist,
+                _ => DbError::UnrecognizedDatabaseError(err),
             },
-            _ => Error::UnrecognizedDatabaseError(err),
+            _ => DbError::UnrecognizedDatabaseError(err),
         }
     }
 }
 
-impl From<BcryptError> for Error {
+impl From<BcryptError> for DbError {
     fn from(err: BcryptError) -> Self {
-        Error::CryptoError(err)
+        DbError::CryptoError(err)
     }
 }
 
 #[derive(Clone)]
 pub struct Database {
-    pool: DBPool,
+    pool: DbPool,
 }
 
 impl std::fmt::Debug for Database {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Database {{ DBPool: {:?} }}", self.pool.state())
+        write!(f, "Database {{ DbPool: {:?} }}", self.pool.state())
     }
 }
 
@@ -81,7 +79,7 @@ impl Database {
     }
 
     #[inline]
-    pub fn conn(&self) -> DBConnection {
+    pub fn conn(&self) -> DbConnection {
         self.pool.get().unwrap()
     }
 

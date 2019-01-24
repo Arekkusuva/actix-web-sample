@@ -1,9 +1,9 @@
 use diesel::prelude::*;
-use diesel::{QueryResult, insert_into};
+use diesel::insert_into;
 
 use bcrypt::{DEFAULT_COST, hash};
 
-use crate::db::Database;
+use crate::db::{Database, DbResult, DbError};
 use crate::db::schema::users;
 
 pub struct Users<'a> {
@@ -15,8 +15,8 @@ impl<'a> Users<'a> {
         Self { db }
     }
 
-    pub fn count(&self) -> QueryResult<i64> {
-        users::table.count().get_result(&self.db.conn())
+    pub fn count(&self) -> DbResult<i64> {
+        users::table.count().get_result(&self.db.conn()).map_err(DbError::from)
     }
 
     pub fn create(&self, email: &str, pwd: &str) {

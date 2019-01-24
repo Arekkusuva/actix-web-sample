@@ -2,10 +2,11 @@ use actix_web::App;
 use actix_web::server;
 
 pub mod prelude;
+pub mod transport;
 
 mod handlers;
 mod middlewares;
-mod transport;
+mod extractors;
 
 use crate::SharedState;
 

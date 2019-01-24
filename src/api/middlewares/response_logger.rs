@@ -1,9 +1,9 @@
-use actix_web::{Result, HttpResponse};
+use actix_web::{Result, HttpResponse, FromRequest};
 use actix_web::middleware::{Started, Finished, Middleware};
 use time::precise_time_ns;
 
 use crate::SharedState;
-use crate::api::middlewares::logger::LoggerReqExt;
+use crate::api::extractors::Logger;
 use crate::api::transport::Request;
 
 pub struct ResponseLoggerMiddleware;
@@ -21,7 +21,7 @@ impl Middleware<SharedState> for ResponseLoggerMiddleware {
         let delta = (precise_time_ns() - start_time.0) as f64 / 1_000_000.0;
 
         info!(
-            req.logger(),
+            Logger::extract(req),
             "Request with response status: {}, took: {} ms",
             resp.status(), delta,
         );

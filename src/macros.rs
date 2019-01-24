@@ -27,7 +27,7 @@ macro_rules! setup_routes {
         for (path, handlers) in r {
             $app = $app.resource(&format!("/{}{}", $name, path), |r| {
                 for (method, handler) in handlers {
-                    r.method(method).f(handler);
+                    r.method(method).with(handler);
                 }
             });
         }

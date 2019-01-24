@@ -1,15 +1,15 @@
 use crate::api::prelude::*;
-use crate::SharedState;
+//use crate::api::transport::users::*;
 
-fn get_users(req: &Request) -> impl Responder {
-    let _l = req.logger();
-    let count = (req.state() as &SharedState).db.users().count();
-    format!("Users count {:?}", count)
+fn get_users(l: Logger, db: Database) -> ResponseResult {
+    info!(l, "test logger");
+    let u_count = db.users().count()?;
+    Ok(Response::new(StatusCode::OK)
+        .data(format!("Users count {}", u_count)))
 }
 
 pub fn config(mut app: ApiApp) -> ApiApp {
     setup_routes!(app, "users", [
-        ("/", Method::GET, get_users),
-        ("/g", Method::GET, get_users),
+        ("/", Method::POST, get_users),
     ])
 }

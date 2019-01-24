@@ -6,6 +6,8 @@ extern crate diesel;
 extern crate serde_derive;
 #[macro_use]
 mod macros;
+#[macro_use]
+extern crate validator_derive;
 mod logger;
 mod api;
 mod db;

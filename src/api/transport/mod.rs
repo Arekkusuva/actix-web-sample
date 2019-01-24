@@ -101,10 +101,10 @@ impl From<DbError> for Response {
         match err {
             DbError::AlreadyExist => Response::with_error(
                 StatusCode::CONFLICT,
-                StatusCode::CONFLICT.canonical_reason().unwrap()),
+                &StatusCode::CONFLICT.canonical_reason().unwrap().to_lowercase()),
             _ => Response::with_error(
                 StatusCode::INTERNAL_SERVER_ERROR,
-                StatusCode::INTERNAL_SERVER_ERROR.canonical_reason().unwrap()),
+                &StatusCode::INTERNAL_SERVER_ERROR.canonical_reason().unwrap().to_lowercase()),
         }
     }
 }

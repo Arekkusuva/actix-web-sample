@@ -45,7 +45,7 @@ impl From<DieselError> for DbError {
             DieselError::NotFound => DbError::NotFound,
             DieselError::DatabaseError(kind, _) => match kind {
                 DatabaseErrorKind::ForeignKeyViolation => DbError::ForeignKeyViolation,
-                DatabaseErrorKind::UnableToSendCommand => DbError::AlreadyExist,
+                DatabaseErrorKind::UniqueViolation => DbError::AlreadyExist,
                 _ => DbError::UnrecognizedDatabaseError(err),
             },
             _ => DbError::UnrecognizedDatabaseError(err),

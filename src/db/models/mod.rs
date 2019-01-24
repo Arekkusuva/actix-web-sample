@@ -1,3 +1,3 @@
-mod users;
+pub mod users;
 
 pub use self::users::Users;

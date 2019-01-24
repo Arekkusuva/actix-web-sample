@@ -2,6 +2,6 @@ table! {
     users (id) {
         id -> Int4,
         email -> Varchar,
-        password -> Varchar,
+        hashed_password -> Varchar,
     }
 }

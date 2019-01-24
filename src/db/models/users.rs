@@ -1,10 +1,23 @@
 use diesel::prelude::*;
-use diesel::insert_into;
+use diesel;
+use diesel::dsl::exists;
 
 use bcrypt::{DEFAULT_COST, hash};
 
 use crate::db::{Database, DbResult, DbError};
 use crate::db::schema::users;
+
+pub struct NewUser<'a> {
+    pub email: &'a str,
+    pub password: &'a str,
+}
+
+#[derive(Queryable)]
+pub struct User {
+    pub id: i32,
+    pub email: String,
+    pub hashed_password: String,
+}
 
 pub struct Users<'a> {
     db: &'a Database,
@@ -16,17 +29,24 @@ impl<'a> Users<'a> {
     }
 
     pub fn count(&self) -> DbResult<i64> {
-        users::table.count().get_result(&self.db.conn()).map_err(DbError::from)
+        Ok(users::table
+            .count()
+            .get_result(&self.db.conn())?)
     }
 
-    pub fn create(&self, email: &str, pwd: &str) {
-        let hashed_pwd = hash(pwd, DEFAULT_COST).unwrap();
-        insert_into(users::table)
+    pub fn email_exists(&self, email: &str) -> DbResult<bool> {
+        Ok(diesel::select(exists(
+            users::table.filter(users::email.eq(email))))
+            .get_result(&self.db.conn())?)
+    }
+
+    pub fn create(&self, user: &NewUser) -> DbResult<User> {
+        let hashed_pwd = hash(user.password, 10).unwrap();
+        Ok(diesel::insert_into(users::table)
             .values((
-                users::email.eq(email),
-                users::password.eq(hashed_pwd),
+                users::email.eq(user.email),
+                users::hashed_password.eq(hashed_pwd),
             ))
-            .returning(users::id)
-            .get_result::<i32>(&self.db.conn()).unwrap();
+            .get_result(&self.db.conn())?)
     }
 }

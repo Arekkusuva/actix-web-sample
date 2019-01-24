@@ -9,11 +9,13 @@ use validator::ValidationErrors;
 use std::convert::Into;
 use std::error::Error;
 use std::fmt;
+use std::collections::HashMap;
 
 pub mod users;
 
 use crate::SharedState;
 use crate::db::DbError;
+use crate::api::errors::IntoValidationErrorStr;
 
 pub type Request = HttpRequest<SharedState>;
 
@@ -38,7 +40,7 @@ impl Serialize for ResponseStatus {
 pub struct Response {
     status: ResponseStatus,
     #[serde(skip_serializing_if = "Option::is_none")]
-    error: Option<String>,
+    error_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     data: Option<JsonValue>,
 }
@@ -47,7 +49,7 @@ impl Response {
     pub fn new(status: StatusCode) -> Self {
         Self {
             status: ResponseStatus(status),
-            error: None,
+            error_type: None,
             data: None,
         }
     }
@@ -55,7 +57,7 @@ impl Response {
     pub fn with_error(status: StatusCode, msg: &str) -> Self {
         Self {
             status: ResponseStatus(status),
-            error: Some(msg.to_owned()),
+            error_type: Some(msg.to_owned()),
             data: None,
         }
     }
@@ -107,10 +109,19 @@ impl From<DbError> for Response {
     }
 }
 
-// TODO: Finish it
 impl From<ValidationErrors> for Response {
-    fn from(_err: ValidationErrors) -> Self {
-        Response::new(StatusCode::BAD_REQUEST)
+    fn from(err: ValidationErrors) -> Self {
+        let fields = err.field_errors();
+        let mut invalid_fields: HashMap<String, &'static str> = HashMap::with_capacity(fields.len());
+        for (f, _) in fields {
+            invalid_fields.insert(
+                f.to_string(),
+                f.into_validation_error_str(),
+            );
+        }
+
+        Response::with_error(StatusCode::BAD_REQUEST, "validation")
+            .data(json!(invalid_fields))
     }
 }
 

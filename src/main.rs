@@ -5,6 +5,8 @@ extern crate diesel;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
+extern crate serde_json;
+#[macro_use]
 mod macros;
 #[macro_use]
 extern crate validator_derive;

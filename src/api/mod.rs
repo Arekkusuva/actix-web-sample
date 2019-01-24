@@ -7,6 +7,7 @@ pub mod transport;
 mod handlers;
 mod middlewares;
 mod extractors;
+mod errors;
 
 use crate::SharedState;
 

@@ -91,8 +91,11 @@ impl Responder for Response {
     type Item = HttpResponse;
     type Error = ActixWebError;
 
-    fn respond_to<S>(self, _: &HttpRequest<S>) -> Result<Self::Item, Self::Error> {
-        Ok(self.into())
+    fn respond_to<S>(mut self, _: &HttpRequest<S>) -> Result<Self::Item, Self::Error> {
+        if self.error_type.is_none() {
+            self.error_type = Some(self.status_code().canonical_reason().unwrap().to_lowercase());
+        }
+        Ok(self.as_http_resp())
     }
 }
 

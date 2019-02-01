@@ -2,14 +2,12 @@ use diesel::prelude::*;
 use diesel;
 use diesel::dsl::exists;
 
-use bcrypt::{DEFAULT_COST, hash};
-
-use crate::db::{Database, DbResult, DbError};
+use crate::db::{Database, DbResult};
 use crate::db::schema::users;
 
 pub struct NewUser<'a> {
     pub email: &'a str,
-    pub password: &'a str,
+    pub hashed_password: &'a str,
 }
 
 #[derive(Queryable)]
@@ -41,11 +39,10 @@ impl<'a> Users<'a> {
     }
 
     pub fn create(&self, user: &NewUser) -> DbResult<User> {
-        let hashed_pwd = hash(user.password, 10).unwrap();
         Ok(diesel::insert_into(users::table)
             .values((
                 users::email.eq(user.email),
-                users::hashed_password.eq(hashed_pwd),
+                users::hashed_password.eq(user.hashed_password),
             ))
             .get_result(&self.db.conn())?)
     }

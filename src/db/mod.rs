@@ -2,7 +2,6 @@ use diesel::result::Error as DieselError;
 use diesel::result::DatabaseErrorKind;
 use diesel::pg::PgConnection;
 use diesel::r2d2::{PooledConnection, ConnectionManager, Pool};
-use bcrypt::BcryptError;
 
 pub mod models;
 pub mod schema;
@@ -19,7 +18,6 @@ pub enum DbError {
     AlreadyExist,
     NotFound,
     ForeignKeyViolation,
-    CryptoError(BcryptError),
     UnrecognizedDatabaseError(DieselError),
 }
 
@@ -31,7 +29,6 @@ impl fmt::Display for DbError {
             DbError::NotFound => f.write_str("NotFound"),
             DbError::AlreadyExist => f.write_str("AlreadyExist"),
             DbError::ForeignKeyViolation => f.write_str("ForeignKeyViolation"),
-            DbError::CryptoError(ref e) => e.fmt(f),
             DbError::UnrecognizedDatabaseError(ref e) => e.fmt(f),
         }
     }
@@ -50,12 +47,6 @@ impl From<DieselError> for DbError {
             },
             _ => DbError::UnrecognizedDatabaseError(err),
         }
-    }
-}
-
-impl From<BcryptError> for DbError {
-    fn from(err: BcryptError) -> Self {
-        DbError::CryptoError(err)
     }
 }
 

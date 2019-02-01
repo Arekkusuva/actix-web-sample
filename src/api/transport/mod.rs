@@ -5,6 +5,7 @@ use actix_web::http::StatusCode;
 use serde::{Serialize, Serializer};
 use serde_json::Value as JsonValue;
 use validator::ValidationErrors;
+use bcrypt::BcryptError;
 
 use std::convert::Into;
 use std::error::Error;
@@ -91,6 +92,7 @@ impl Responder for Response {
     type Item = HttpResponse;
     type Error = ActixWebError;
 
+    // TODO: Log errors
     fn respond_to<S>(mut self, _: &HttpRequest<S>) -> Result<Self::Item, Self::Error> {
         if self.error_type.is_none() {
             self.error_type = Some(self.status_code().canonical_reason().unwrap().to_lowercase());
@@ -109,6 +111,14 @@ impl From<DbError> for Response {
                 StatusCode::INTERNAL_SERVER_ERROR,
                 &StatusCode::INTERNAL_SERVER_ERROR.canonical_reason().unwrap().to_lowercase()),
         }
+    }
+}
+
+impl From<BcryptError> for Response {
+    fn from(_: BcryptError) -> Self {
+        Response::with_error(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            &StatusCode::INTERNAL_SERVER_ERROR.canonical_reason().unwrap().to_lowercase())
     }
 }
 
